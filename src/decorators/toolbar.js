@@ -2,31 +2,35 @@ import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 
 // Get a component's display name
-const getDisplayName = WrappedComponent =>
-  WrappedComponent.displayName || WrappedComponent.name || 'WrappedComponent';
+const getDisplayName = (WrappedComponent) => {
+  const component = WrappedComponent.WrappedComponent || WrappedComponent;
+  return component.displayName || component.name || 'Component';
+};
 
 let number = 0;
 
 // HoverToolbar decorator will render a toolbar on hovering the WrappedComponent
-export default ({ theme, customRender }) => WrappedComponent => class FocusedToolbarDecorator extends Component {
+export default ({ theme, customRender }) => (WrappedComponent) => class FocusedToolbarDecorator extends Component {
   // Statics
-  static WrappedComponent = WrappedComponent.WrappedComponent || WrappedComponent;
   static displayName = `FocusedToolbar(${getDisplayName(WrappedComponent)})`;
+  static WrappedComponent = WrappedComponent.WrappedComponent || WrappedComponent;
 
   // Bind listeners on mount
   componentDidMount() {
     // Set this.number to a unique value
-    this.number = number++;
+    number += 1;
+    this.number = number;
 
     // Bind listeners
     this.componentDidUpdate();
   }
 
   componentDidUpdate() {
+    // eslint-disable-next-line react/no-find-dom-node
     this.DOMNode = ReactDOM.findDOMNode(this);
     if (!customRender) {
       this.renderToolbar(
-        [...(this.props.actions || []), ...(this._componentActions || [])],
+        [...(this.props.actions || []), ...(this.componentActions || [])],
         this.props.blockProps.isFocused
       );
     }
@@ -35,7 +39,7 @@ export default ({ theme, customRender }) => WrappedComponent => class FocusedToo
   componentWillUnmount() {
     if (!customRender) {
       this.renderToolbar(
-        [...(this.props.actions || []), ...(this._componentActions || [])],
+        [...(this.props.actions || []), ...(this.componentActions || [])],
         false
       );
     }
@@ -60,8 +64,8 @@ export default ({ theme, customRender }) => WrappedComponent => class FocusedToo
     }
   }
 
-  addActions = actions => {
-    this._componentActions = actions;
+  addActions = (actions) => {
+    this.componentActions = actions;
   }
 
   render() {

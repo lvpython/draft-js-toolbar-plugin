@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 
 // Get a component's display name
-const getDisplayName = WrappedComponent => {
+const getDisplayName = (WrappedComponent) => {
   const component = WrappedComponent.WrappedComponent || WrappedComponent;
   return component.displayName || component.name || 'Component';
 };
@@ -10,7 +10,7 @@ const getDisplayName = WrappedComponent => {
 let number = 0;
 
 // HoverToolbar decorator will render a toolbar on hovering the WrappedComponent
-export default (defaultTheme, toolbarStore) => WrappedComponent => class HoverToolbarDecorator extends Component {
+export default (defaultTheme, toolbarStore) => (WrappedComponent) => class HoverToolbarDecorator extends Component {
   // Statics
   static displayName = `HoverToolbar(${getDisplayName(WrappedComponent)})`;
   static pluginOptions = WrappedComponent.pluginOptions;
@@ -25,9 +25,11 @@ export default (defaultTheme, toolbarStore) => WrappedComponent => class HoverTo
   // Bind listeners on mount
   componentDidMount() {
     // Set this.number to a unique value
-    this.number = number = number++;
+    number += 1;
+    this.number = number;
 
     // Get this domNode
+    // eslint-disable-next-line react/no-find-dom-node
     const element = ReactDOM.findDOMNode(this);
     if (!element) {
       return;
@@ -51,7 +53,7 @@ export default (defaultTheme, toolbarStore) => WrappedComponent => class HoverTo
   }
 
   // Show the toolbar
-  showToolbar = event => {
+  showToolbar = (event) => {
     this.doRenderToolbar(true);
     if (event) event.stopPropagation();
   };
@@ -63,29 +65,29 @@ export default (defaultTheme, toolbarStore) => WrappedComponent => class HoverTo
 
   // If mouse on toolbar
   mouseOverToolbar = () => {
-    this._mouseOverToolbar = true;
+    this.mouseOverToolbar = true;
   };
 
   // If mouse leaves toolbar
   mouseLeaveToolbar = () => {
-    this._mouseOverToolbar = false;
+    this.mouseOverToolbar = false;
     this.hideToolbar();
   };
 
   // Hide toolbar after delay and if mouse not on the toolbar
   hideToolbarDelayed = () => {
     setTimeout(() => {
-      if (!this._mouseOverToolbar) {
+      if (!this.mouseOverToolbar) {
         this.hideToolbar();
       }
     }, 1);
   };
 
   // Render the actual toolbar
-  doRenderToolbar = active => {
+  doRenderToolbar = (active) => {
     const props = {
       ...this.props,
-      actions: [...(this.props.actions || []), ...(this._componentActions || [])],
+      actions: [...(this.props.actions || []), ...(this.componentActions || [])],
       theme: this.props.theme || defaultTheme,
       onMouseOver: this.mouseOverToolbar,
       onMouseLeave: this.mouseLeaveToolbar,
@@ -99,8 +101,8 @@ export default (defaultTheme, toolbarStore) => WrappedComponent => class HoverTo
     }
   }
 
-  addActions = actions => {
-    this._componentActions = actions;
+  addActions = (actions) => {
+    this.componentActions = actions;
   }
 
   render() {
